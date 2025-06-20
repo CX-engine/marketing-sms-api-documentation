@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.j
 import { ScrollArea } from '@/components/ui/scroll-area.jsx'
 import { Separator } from '@/components/ui/separator.jsx'
 import { Input } from '@/components/ui/input.jsx'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.jsx'
 import { 
   Search, 
   Send, 
@@ -16,6 +17,7 @@ import {
   Settings, 
   Key,
   ChevronRight,
+  ChevronDown,
   Copy,
   Check,
   ExternalLink,
@@ -23,7 +25,11 @@ import {
   Book,
   Zap,
   Shield,
-  Globe
+  Globe,
+  List,
+  FileText,
+  Webhook,
+  Mail
 } from 'lucide-react'
 import './App.css'
 
@@ -31,6 +37,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const [activeEndpoint, setActiveEndpoint] = useState(null)
   const [copiedCode, setCopiedCode] = useState('')
+  const [openCategories, setOpenCategories] = useState({})
 
   const copyToClipboard = async (text, id) => {
     try {
@@ -39,6 +46,20 @@ function App() {
       setTimeout(() => setCopiedCode(''), 2000)
     } catch (err) {
       console.error('Failed to copy text: ', err)
+    }
+  }
+
+  const toggleCategory = (categoryId) => {
+    setOpenCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }))
+  }
+
+  const scrollToEndpoint = (categoryId, endpointIndex) => {
+    const element = document.getElementById(`${categoryId}-endpoint-${endpointIndex}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 
@@ -71,6 +92,498 @@ function App() {
           requiresAuth: true,
           response: {
             message: 'successful-logout'
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/password-reset-request',
+          title: 'Request Password Reset',
+          description: 'Send password reset link to user email',
+          requestBody: {
+            email: 'user@example.com'
+          },
+          response: {
+            success: true,
+            message: 'passwords.sent'
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/password-reset',
+          title: 'Reset Password',
+          description: 'Reset user password using token from email',
+          requestBody: {
+            email: 'user@example.com',
+            token: 'abc123def456',
+            password: 'newPassword123'
+          },
+          response: {
+            success: true,
+            message: 'passwords.reset'
+          }
+        }
+      ]
+    },
+    {
+      id: 'users',
+      category: 'Users',
+      icon: Users,
+      color: 'bg-indigo-500',
+      endpoints: [
+        {
+          method: 'GET',
+          path: '/api/users',
+          title: 'List Users',
+          description: 'Get paginated list of users',
+          requiresAuth: true,
+          queryParams: {
+            page: 1,
+            per_page: 20
+          },
+          response: {
+            data: [{ id: '1', name: 'John Doe', email: 'john@example.com', role: 'user' }],
+            current_page: 1,
+            total: 100
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/users',
+          title: 'Create User',
+          description: 'Create a new user',
+          requiresAuth: true,
+          requestBody: {
+            name: 'John Doe',
+            email: 'john@example.com',
+            password: 'password123',
+            role: 'user'
+          },
+          response: {
+            id: '1',
+            name: 'John Doe',
+            email: 'john@example.com',
+            role: 'user'
+          }
+        },
+        {
+          method: 'GET',
+          path: '/api/users/{user}',
+          title: 'Get User',
+          description: 'Get user details by ID',
+          requiresAuth: true,
+          response: {
+            id: '1',
+            name: 'John Doe',
+            email: 'john@example.com',
+            role: 'user'
+          }
+        },
+        {
+          method: 'PUT',
+          path: '/api/users/{user}',
+          title: 'Update User',
+          description: 'Update user details',
+          requiresAuth: true,
+          requestBody: {
+            name: 'John Doe Updated',
+            email: 'john.updated@example.com'
+          },
+          response: {
+            user: { id: '1', name: 'John Doe Updated' },
+            updated: true
+          }
+        },
+        {
+          method: 'DELETE',
+          path: '/api/users/{user}',
+          title: 'Delete User',
+          description: 'Delete a user',
+          requiresAuth: true,
+          response: {
+            deleted: true
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/users/{user}/welcome',
+          title: 'Send Welcome Message',
+          description: 'Send welcome message to user (signed route)',
+          requestBody: {
+            signature: 'signed_url_signature'
+          },
+          response: {
+            success: true
+          }
+        }
+      ]
+    },
+    {
+      id: 'organisations',
+      category: 'Organizations',
+      icon: Building2,
+      color: 'bg-cyan-500',
+      endpoints: [
+        {
+          method: 'GET',
+          path: '/api/organisations',
+          title: 'List Organizations',
+          description: 'Get paginated list of organizations',
+          requiresAuth: true,
+          response: {
+            data: [{ id: '1', name: 'Acme Corp' }],
+            current_page: 1,
+            total: 50
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/organisations',
+          title: 'Create Organization',
+          description: 'Create a new organization',
+          requiresAuth: true,
+          requestBody: {
+            name: 'Acme Corp'
+          },
+          response: {
+            id: '1',
+            name: 'Acme Corp'
+          }
+        },
+        {
+          method: 'GET',
+          path: '/api/organisations/{organisation}',
+          title: 'Get Organization',
+          description: 'Get organization details by ID',
+          requiresAuth: true,
+          response: {
+            id: '1',
+            name: 'Acme Corp'
+          }
+        },
+        {
+          method: 'PUT',
+          path: '/api/organisations/{organisation}',
+          title: 'Update Organization',
+          description: 'Update organization details',
+          requiresAuth: true,
+          requestBody: {
+            name: 'Acme Corp Updated'
+          },
+          response: {
+            organisation: { id: '1', name: 'Acme Corp Updated' },
+            updated: true
+          }
+        },
+        {
+          method: 'DELETE',
+          path: '/api/organisations/{organisation}',
+          title: 'Delete Organization',
+          description: 'Delete an organization',
+          requiresAuth: true,
+          response: {
+            deleted: true
+          }
+        }
+      ]
+    },
+    {
+      id: 'accounts',
+      category: 'Accounts',
+      icon: Settings,
+      color: 'bg-slate-500',
+      endpoints: [
+        {
+          method: 'GET',
+          path: '/api/accounts',
+          title: 'List Accounts',
+          description: 'Get paginated list of accounts',
+          requiresAuth: true,
+          response: {
+            data: [{ id: '1', name: 'Marketing Account' }],
+            current_page: 1,
+            total: 25
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/accounts',
+          title: 'Create Account',
+          description: 'Create a new account',
+          requiresAuth: true,
+          requestBody: {
+            name: 'Marketing Account',
+            organisation_id: '1'
+          },
+          response: {
+            id: '1',
+            name: 'Marketing Account'
+          }
+        },
+        {
+          method: 'GET',
+          path: '/api/accounts/{account}',
+          title: 'Get Account',
+          description: 'Get account details by ID',
+          requiresAuth: true,
+          response: {
+            id: '1',
+            name: 'Marketing Account'
+          }
+        },
+        {
+          method: 'PUT',
+          path: '/api/accounts/{account}',
+          title: 'Update Account',
+          description: 'Update account details',
+          requiresAuth: true,
+          requestBody: {
+            name: 'Marketing Account Updated'
+          },
+          response: {
+            account: { id: '1', name: 'Marketing Account Updated' },
+            updated: true
+          }
+        },
+        {
+          method: 'DELETE',
+          path: '/api/accounts/{account}',
+          title: 'Delete Account',
+          description: 'Delete an account',
+          requiresAuth: true,
+          response: {
+            deleted: true
+          }
+        },
+        {
+          method: 'GET',
+          path: '/api/accounts/{account}/users',
+          title: 'List Account Users',
+          description: 'Get users associated with an account',
+          requiresAuth: true,
+          response: [
+            { id: '1', name: 'John Doe', email: 'john@example.com' }
+          ]
+        },
+        {
+          method: 'PUT',
+          path: '/api/accounts/{account}/users',
+          title: 'Update Account Users',
+          description: 'Associate users with an account',
+          requiresAuth: true,
+          requestBody: {
+            user_ids: ['1', '2', '3']
+          },
+          response: {
+            success: true
+          }
+        }
+      ]
+    },
+    {
+      id: 'recipients',
+      category: 'Recipients',
+      icon: Users,
+      color: 'bg-purple-500',
+      endpoints: [
+        {
+          method: 'GET',
+          path: '/api/recipients',
+          title: 'List Recipients',
+          description: 'Get list of recipients with optional filtering',
+          requiresAuth: true,
+          queryParams: {
+            account_id: '1',
+            list_id: '1',
+            'filter[name]': 'John'
+          },
+          response: {
+            recipients: [
+              {
+                id: '1',
+                number: '+1234567890',
+                name: 'John Doe',
+                account_id: '1'
+              }
+            ],
+            count: 150
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/recipients',
+          title: 'Create Recipients',
+          description: 'Create one or more recipients',
+          requiresAuth: true,
+          requestBody: {
+            account_id: '1',
+            list_id: '1',
+            recipients: [
+              { number: '+1234567890', name: 'John Doe' },
+              { number: '+1987654321', name: 'Jane Smith' }
+            ]
+          },
+          response: {
+            recipients: [
+              { id: '1', number: '+1234567890', name: 'John Doe' },
+              { id: '2', number: '+1987654321', name: 'Jane Smith' }
+            ]
+          }
+        },
+        {
+          method: 'GET',
+          path: '/api/recipients/{recipient}',
+          title: 'Get Recipient',
+          description: 'Get recipient details by ID',
+          requiresAuth: true,
+          response: {
+            id: '1',
+            number: '+1234567890',
+            name: 'John Doe'
+          }
+        },
+        {
+          method: 'PUT',
+          path: '/api/recipients/{recipient}',
+          title: 'Update Recipient',
+          description: 'Update recipient details',
+          requiresAuth: true,
+          requestBody: {
+            number: '+1234567890',
+            name: 'John Doe Updated'
+          },
+          response: {
+            recipient: { id: '1', name: 'John Doe Updated' },
+            updated: true
+          }
+        },
+        {
+          method: 'DELETE',
+          path: '/api/recipients/{recipient}',
+          title: 'Delete Recipient',
+          description: 'Delete a recipient',
+          requiresAuth: true,
+          response: {
+            deleted: true
+          }
+        },
+        {
+          method: 'GET',
+          path: '/api/recipients-export',
+          title: 'List Recipient Exports',
+          description: 'Get list of recipient export jobs',
+          requiresAuth: true,
+          response: [
+            { id: '1', status: 'completed', format: 'csv' }
+          ]
+        },
+        {
+          method: 'POST',
+          path: '/api/recipients-export',
+          title: 'Create Recipient Export',
+          description: 'Create a new recipient export job',
+          requiresAuth: true,
+          requestBody: {
+            account_id: '1',
+            format: 'csv'
+          },
+          response: {
+            id: '1',
+            status: 'pending'
+          }
+        }
+      ]
+    },
+    {
+      id: 'recipient-lists',
+      category: 'Recipient Lists',
+      icon: List,
+      color: 'bg-pink-500',
+      endpoints: [
+        {
+          method: 'GET',
+          path: '/api/recipient-lists',
+          title: 'List Recipient Lists',
+          description: 'Get paginated list of recipient lists',
+          requiresAuth: true,
+          response: {
+            data: [{ id: '1', name: 'VIP Customers', recipients_count: 150 }],
+            current_page: 1,
+            total: 10
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/recipient-lists',
+          title: 'Create Recipient List',
+          description: 'Create a new recipient list',
+          requiresAuth: true,
+          requestBody: {
+            name: 'VIP Customers',
+            description: 'High-value customers',
+            account_id: '1'
+          },
+          response: {
+            id: '1',
+            name: 'VIP Customers'
+          }
+        },
+        {
+          method: 'GET',
+          path: '/api/recipient-lists/{list}',
+          title: 'Get Recipient List',
+          description: 'Get recipient list details by ID',
+          requiresAuth: true,
+          response: {
+            id: '1',
+            name: 'VIP Customers',
+            recipients_count: 150
+          }
+        },
+        {
+          method: 'PUT',
+          path: '/api/recipient-lists/{list}',
+          title: 'Update Recipient List',
+          description: 'Update recipient list details',
+          requiresAuth: true,
+          requestBody: {
+            name: 'VIP Customers Updated'
+          },
+          response: {
+            list: { id: '1', name: 'VIP Customers Updated' },
+            updated: true
+          }
+        },
+        {
+          method: 'DELETE',
+          path: '/api/recipient-lists/{list}',
+          title: 'Delete Recipient List',
+          description: 'Delete a recipient list',
+          requiresAuth: true,
+          response: {
+            deleted: true
+          }
+        },
+        {
+          method: 'GET',
+          path: '/api/recipient-lists/{list}/recipients',
+          title: 'List Recipients in List',
+          description: 'Get recipients associated with a list',
+          requiresAuth: true,
+          response: [
+            { id: '1', number: '+1234567890', name: 'John Doe' }
+          ]
+        },
+        {
+          method: 'PUT',
+          path: '/api/recipient-lists/{list}/recipients',
+          title: 'Update List Recipients',
+          description: 'Associate recipients with a list',
+          requiresAuth: true,
+          requestBody: {
+            recipient_ids: ['1', '2', '3']
+          },
+          response: {
+            success: true
           }
         }
       ]
@@ -134,58 +647,87 @@ function App() {
             },
             messages_count: 150
           }
+        },
+        {
+          method: 'GET',
+          path: '/api/campaigns/{campaign}',
+          title: 'Get Campaign',
+          description: 'Get SMS campaign details by ID',
+          requiresAuth: true,
+          response: {
+            id: '1',
+            name: 'Summer Sale Campaign',
+            content: 'Get 20% off! Use code SUMMER20'
+          }
+        },
+        {
+          method: 'PUT',
+          path: '/api/campaigns/{campaign}',
+          title: 'Update Campaign',
+          description: 'Update SMS campaign details',
+          requiresAuth: true,
+          requestBody: {
+            name: 'Summer Sale Campaign Updated'
+          },
+          response: {
+            campaign: { id: '1', name: 'Summer Sale Campaign Updated' },
+            updated: true
+          }
+        },
+        {
+          method: 'DELETE',
+          path: '/api/campaigns/{campaign}',
+          title: 'Delete Campaign',
+          description: 'Delete an SMS campaign',
+          requiresAuth: true,
+          response: {
+            deleted: true
+          }
         }
       ]
     },
     {
-      id: 'recipients',
-      category: 'Recipients',
-      icon: Users,
-      color: 'bg-purple-500',
+      id: 'messages',
+      category: 'SMS Messages',
+      icon: MessageSquare,
+      color: 'bg-yellow-500',
       endpoints: [
         {
           method: 'GET',
-          path: '/api/recipients',
-          title: 'List Recipients',
-          description: 'Get list of recipients with optional filtering',
+          path: '/api/messages',
+          title: 'List SMS Messages',
+          description: 'Get paginated list of SMS messages',
           requiresAuth: true,
           queryParams: {
-            account_id: '1',
-            list_id: '1',
-            'filter[name]': 'John'
+            page: 1,
+            per_page: 20,
+            campaign_id: '1'
           },
           response: {
-            recipients: [
+            data: [
               {
                 id: '1',
-                number: '+1234567890',
-                name: 'John Doe',
-                account_id: '1',
-                created_at: '2023-06-20T10:00:00Z'
+                sms_campaign_id: '1',
+                recipient_id: '1',
+                status: 'delivered',
+                sent_at: '2023-06-20T10:00:00Z'
               }
             ],
-            count: 150
+            current_page: 1,
+            total: 500
           }
         },
         {
-          method: 'POST',
-          path: '/api/recipients',
-          title: 'Create Recipients',
-          description: 'Create one or more recipients',
+          method: 'GET',
+          path: '/api/messages/{message}',
+          title: 'Get SMS Message',
+          description: 'Get SMS message details by ID',
           requiresAuth: true,
-          requestBody: {
-            account_id: '1',
-            list_id: '1',
-            recipients: [
-              { number: '+1234567890', name: 'John Doe' },
-              { number: '+1987654321', name: 'Jane Smith' }
-            ]
-          },
           response: {
-            recipients: [
-              { id: '1', number: '+1234567890', name: 'John Doe' },
-              { id: '2', number: '+1987654321', name: 'Jane Smith' }
-            ]
+            id: '1',
+            sms_campaign_id: '1',
+            recipient_id: '1',
+            status: 'delivered'
           }
         }
       ]
@@ -215,10 +757,111 @@ function App() {
             success_rate: 97.9,
             period: { from: '2023-01-01', to: '2023-12-31' }
           }
+        },
+        {
+          method: 'GET',
+          path: '/api/summary/success-rate',
+          title: 'Get Success Rate Statistics',
+          description: 'Get detailed success rate analytics',
+          requiresAuth: true,
+          queryParams: {
+            account_id: '1',
+            date_from: '2023-01-01',
+            date_to: '2023-12-31'
+          },
+          response: {
+            overall_success_rate: 97.9,
+            daily_stats: [
+              {
+                date: '2023-06-20',
+                sent: 150,
+                delivered: 147,
+                success_rate: 98.0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      id: 'webhooks',
+      category: 'Webhooks',
+      icon: Webhook,
+      color: 'bg-red-500',
+      endpoints: [
+        {
+          method: 'POST',
+          path: '/api/webhook/sms/iag',
+          title: 'SMS IAG Webhook',
+          description: 'Webhook endpoint for SMS provider IAG status updates',
+          requestBody: {
+            message_id: 'ext_msg_123456',
+            status: 'delivered',
+            timestamp: '2023-06-20T10:00:00Z'
+          },
+          response: {
+            success: true
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/incoming-mail/mg',
+          title: 'Mailgun Incoming Mail',
+          description: 'Webhook endpoint for Mailgun incoming mail processing',
+          requestBody: {
+            sender: 'user@example.com',
+            subject: 'SMS Campaign Request',
+            body: 'Please send SMS to my list'
+          },
+          response: {
+            success: true
+          }
+        },
+        {
+          method: 'POST',
+          path: '/api/incoming-mail/pm',
+          title: 'Postmark Incoming Mail',
+          description: 'Webhook endpoint for Postmark incoming mail processing',
+          requestBody: {
+            From: 'user@example.com',
+            Subject: 'SMS Campaign Request',
+            TextBody: 'Please send SMS to my list'
+          },
+          response: {
+            success: true
+          }
+        }
+      ]
+    },
+    {
+      id: 'feedback',
+      category: 'Feedback',
+      icon: Mail,
+      color: 'bg-teal-500',
+      endpoints: [
+        {
+          method: 'POST',
+          path: '/api/feedback-forms',
+          title: 'Submit Feedback',
+          description: 'Submit feedback form',
+          requiresAuth: true,
+          requestBody: {
+            subject: 'Feature Request',
+            message: 'It would be great to have scheduling functionality',
+            email: 'user@example.com',
+            name: 'John Doe'
+          },
+          response: {
+            success: true,
+            message: 'Thank you for your feedback'
+          }
         }
       ]
     }
   ]
+
+  // Calculate total endpoints
+  const totalEndpoints = endpoints.reduce((total, category) => total + category.endpoints.length, 0)
 
   const filteredEndpoints = endpoints.map(category => ({
     ...category,
@@ -313,11 +956,11 @@ function App() {
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Endpoints</span>
-                    <Badge variant="secondary">25+</Badge>
+                    <Badge variant="secondary">{totalEndpoints}</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Categories</span>
-                    <Badge variant="secondary">8</Badge>
+                    <Badge variant="secondary">{endpoints.length}</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Auth Type</span>
@@ -334,22 +977,50 @@ function App() {
                 <CardContent className="space-y-2">
                   {endpoints.map((category) => {
                     const Icon = category.icon
+                    const isOpen = openCategories[category.id]
                     return (
-                      <Button
+                      <Collapsible
                         key={category.id}
-                        variant="ghost"
-                        className="w-full justify-start h-auto p-3"
-                        onClick={() => {
-                          document.getElementById(category.id)?.scrollIntoView({ behavior: 'smooth' })
-                        }}
+                        open={isOpen}
+                        onOpenChange={() => toggleCategory(category.id)}
                       >
-                        <div className={`w-2 h-2 rounded-full mr-3 ${category.color}`}></div>
-                        <Icon className="h-4 w-4 mr-2" />
-                        <span className="text-sm">{category.category}</span>
-                        <Badge variant="secondary" className="ml-auto">
-                          {category.endpoints.length}
-                        </Badge>
-                      </Button>
+                        <CollapsibleTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start h-auto p-3"
+                          >
+                            <div className={`w-2 h-2 rounded-full mr-3 ${category.color}`}></div>
+                            <Icon className="h-4 w-4 mr-2" />
+                            <span className="text-sm flex-1 text-left">{category.category}</span>
+                            <Badge variant="secondary" className="mr-2">
+                              {category.endpoints.length}
+                            </Badge>
+                            {isOpen ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-1 ml-6 mt-2">
+                          {category.endpoints.map((endpoint, index) => (
+                            <Button
+                              key={index}
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start text-xs h-8 pl-4"
+                              onClick={() => scrollToEndpoint(category.id, index)}
+                            >
+                              <Badge 
+                                className={`${getMethodColor(endpoint.method)} mr-2 text-xs px-1 py-0`}
+                              >
+                                {endpoint.method}
+                              </Badge>
+                              <span className="truncate">{endpoint.title}</span>
+                            </Button>
+                          ))}
+                        </CollapsibleContent>
+                      </Collapsible>
                     )
                   })}
                 </CardContent>
@@ -416,7 +1087,7 @@ function App() {
 
                   <div className="space-y-6">
                     {category.endpoints.map((endpoint, index) => (
-                      <Card key={index} className="overflow-hidden">
+                      <Card key={index} id={`${category.id}-endpoint-${index}`} className="overflow-hidden">
                         <CardHeader className="bg-gray-50 dark:bg-gray-800/50">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
