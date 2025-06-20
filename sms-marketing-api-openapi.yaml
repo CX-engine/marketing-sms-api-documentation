@@ -1,0 +1,2174 @@
+openapi: 3.0.3
+info:
+  title: SMS Marketing API
+  description: |
+    A comprehensive SMS marketing API that allows users to manage SMS campaigns, recipients, and organizations. 
+    
+    ## Features
+    - Role-based access control (Admin, Manager, User)
+    - Multi-tenant architecture (Organizations > Accounts > Users)
+    - Campaign management with multiple recipient targeting options
+    - Recipient and list management
+    - Real-time webhooks and integrations
+    - Comprehensive reporting and analytics
+    
+    ## Authentication
+    This API uses OAuth2 with Personal Access Tokens. Include your token in the Authorization header:
+    ```
+    Authorization: Bearer YOUR_ACCESS_TOKEN
+    ```
+  version: 1.0.0
+  contact:
+    name: CX Engine Support
+    email: support@cx-engine.com
+  license:
+    name: Proprietary
+    
+servers:
+  - url: https://api.your-domain.com/api
+    description: Production server
+  - url: https://staging-api.your-domain.com/api
+    description: Staging server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and receive access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: invalid-credentials
+
+  /logout:
+    get:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Revoke current access token
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: successful-logout
+
+  /password-reset-request:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      description: Send password reset link to user's email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+      responses:
+        '200':
+          description: Reset link sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: passwords.sent
+        '406':
+          description: Failed to send reset link
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+
+  /password-reset:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      description: Reset user password using token from email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - token
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                token:
+                  type: string
+                  example: abc123def456
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: newPassword123
+                  description: Must be at least 8 characters with mixed case and numbers
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: passwords.reset
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: List users
+      description: Get paginated list of users (filtered by role permissions)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsers'
+    
+    post:
+      tags:
+        - Users
+      summary: Create user
+      description: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /users/{user}:
+    get:
+      tags:
+        - Users
+      summary: Get user
+      description: Get user details by ID
+      parameters:
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Update user details
+      parameters:
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  updated:
+                    type: boolean
+                    example: true
+    
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Delete a user
+      parameters:
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                    example: true
+
+  /organisations:
+    get:
+      tags:
+        - Organizations
+      summary: List organizations
+      description: Get paginated list of organizations
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Organizations retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrganizations'
+    
+    post:
+      tags:
+        - Organizations
+      summary: Create organization
+      description: Create a new organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationRequest'
+      responses:
+        '201':
+          description: Organization created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+
+  /organisations/{organisation}:
+    get:
+      tags:
+        - Organizations
+      summary: Get organization
+      description: Get organization details by ID
+      parameters:
+        - name: organisation
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization ID
+      responses:
+        '200':
+          description: Organization retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+    
+    put:
+      tags:
+        - Organizations
+      summary: Update organization
+      description: Update organization details
+      parameters:
+        - name: organisation
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganizationRequest'
+      responses:
+        '200':
+          description: Organization updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  organisation:
+                    $ref: '#/components/schemas/Organization'
+                  updated:
+                    type: boolean
+    
+    delete:
+      tags:
+        - Organizations
+      summary: Delete organization
+      description: Delete an organization
+      parameters:
+        - name: organisation
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization ID
+      responses:
+        '200':
+          description: Organization deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+
+  /accounts:
+    get:
+      tags:
+        - Accounts
+      summary: List accounts
+      description: Get paginated list of accounts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAccounts'
+    
+    post:
+      tags:
+        - Accounts
+      summary: Create account
+      description: Create a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+
+  /accounts/{account}:
+    get:
+      tags:
+        - Accounts
+      summary: Get account
+      description: Get account details by ID
+      parameters:
+        - name: account
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Account ID
+      responses:
+        '200':
+          description: Account retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+    
+    put:
+      tags:
+        - Accounts
+      summary: Update account
+      description: Update account details
+      parameters:
+        - name: account
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Account ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountRequest'
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    $ref: '#/components/schemas/Account'
+                  updated:
+                    type: boolean
+    
+    delete:
+      tags:
+        - Accounts
+      summary: Delete account
+      description: Delete an account
+      parameters:
+        - name: account
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Account ID
+      responses:
+        '200':
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+
+  /accounts/{account}/users:
+    get:
+      tags:
+        - Accounts
+      summary: List account users
+      description: Get users associated with an account
+      parameters:
+        - name: account
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Account ID
+      responses:
+        '200':
+          description: Account users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    
+    put:
+      tags:
+        - Accounts
+      summary: Update account users
+      description: Associate users with an account
+      parameters:
+        - name: account
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Account ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_ids:
+                  type: array
+                  items:
+                    type: string
+                  example: ["1", "2", "3"]
+      responses:
+        '200':
+          description: Account users updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        role:
+          type: string
+          enum: [admin, manager, user]
+          example: user
+        organisation_id:
+          type: string
+          nullable: true
+          example: "1"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: Acme Corp
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: Marketing Account
+        organisation_id:
+          type: string
+          example: "1"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateUserRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - role
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: password123
+        role:
+          type: string
+          enum: [admin, manager, user]
+          example: user
+        organisation_id:
+          type: string
+          nullable: true
+          example: "1"
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        role:
+          type: string
+          enum: [admin, manager, user]
+          example: user
+        organisation_id:
+          type: string
+          nullable: true
+          example: "1"
+
+    CreateOrganizationRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Acme Corp
+
+    UpdateOrganizationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Acme Corp
+
+    CreateAccountRequest:
+      type: object
+      required:
+        - name
+        - organisation_id
+      properties:
+        name:
+          type: string
+          example: Marketing Account
+        organisation_id:
+          type: string
+          example: "1"
+
+    UpdateAccountRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Marketing Account
+        organisation_id:
+          type: string
+          example: "1"
+
+    PaginatedUsers:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        current_page:
+          type: integer
+          example: 1
+        last_page:
+          type: integer
+          example: 5
+        per_page:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 100
+
+    PaginatedOrganizations:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    PaginatedAccounts:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Resource not found
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: The given data was invalid.
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            email: ["The email field is required."]
+            password: ["The password must be at least 8 characters."]
+
+
+  /recipients:
+    get:
+      tags:
+        - Recipients
+      summary: List recipients
+      description: Get list of recipients with optional filtering
+      parameters:
+        - name: list_id
+          in: query
+          schema:
+            type: string
+          description: Filter by recipient list ID
+        - name: account_id
+          in: query
+          schema:
+            type: string
+          description: Filter by account ID
+        - name: filter[id]
+          in: query
+          schema:
+            type: string
+          description: Filter by recipient ID
+        - name: filter[number]
+          in: query
+          schema:
+            type: string
+          description: Filter by phone number
+        - name: filter[name]
+          in: query
+          schema:
+            type: string
+          description: Filter by recipient name
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [id, name, -id, -name]
+          description: Sort results (prefix with - for descending)
+      responses:
+        '200':
+          description: Recipients retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recipients:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recipient'
+                  count:
+                    type: integer
+                    example: 150
+    
+    post:
+      tags:
+        - Recipients
+      summary: Create recipients
+      description: Create one or more recipients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - account_id
+                - recipients
+              properties:
+                account_id:
+                  type: string
+                  example: "1"
+                list_id:
+                  type: string
+                  nullable: true
+                  example: "1"
+                  description: Optional list to add recipients to
+                recipients:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - number
+                    properties:
+                      id:
+                        type: string
+                        description: Existing recipient ID (for updates)
+                      number:
+                        type: string
+                        example: "+1234567890"
+                        description: Phone number in international format
+                      name:
+                        type: string
+                        example: John Doe
+                        description: Recipient name
+      responses:
+        '200':
+          description: Recipients created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recipients:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recipient'
+        '422':
+          description: Invalid phone number provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid phone number provided.
+                  hint:
+                    type: array
+                    items:
+                      type: string
+                    example: ["123-invalid", "abc-def"]
+
+  /recipients/{recipient}:
+    get:
+      tags:
+        - Recipients
+      summary: Get recipient
+      description: Get recipient details by ID
+      parameters:
+        - name: recipient
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Recipient ID
+      responses:
+        '200':
+          description: Recipient retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipient'
+    
+    put:
+      tags:
+        - Recipients
+      summary: Update recipient
+      description: Update recipient details
+      parameters:
+        - name: recipient
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Recipient ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                number:
+                  type: string
+                  example: "+1234567890"
+                name:
+                  type: string
+                  example: John Doe
+      responses:
+        '200':
+          description: Recipient updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recipient:
+                    $ref: '#/components/schemas/Recipient'
+                  updated:
+                    type: boolean
+                    example: true
+        '422':
+          description: Invalid phone number provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid phone number provided.
+                  hint:
+                    type: string
+                    example: "123-invalid"
+    
+    delete:
+      tags:
+        - Recipients
+      summary: Delete recipient
+      description: Delete a recipient
+      parameters:
+        - name: recipient
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Recipient ID
+      responses:
+        '200':
+          description: Recipient deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                    example: true
+
+  /recipients-export:
+    get:
+      tags:
+        - Recipients
+      summary: List recipient exports
+      description: Get list of recipient export jobs
+      responses:
+        '200':
+          description: Recipient exports retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipientExport'
+    
+    post:
+      tags:
+        - Recipients
+      summary: Create recipient export
+      description: Create a new recipient export job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account_id:
+                  type: string
+                  example: "1"
+                list_id:
+                  type: string
+                  nullable: true
+                  example: "1"
+                format:
+                  type: string
+                  enum: [csv, xlsx]
+                  default: csv
+      responses:
+        '200':
+          description: Export job created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientExport'
+
+  /recipient-lists:
+    get:
+      tags:
+        - Recipient Lists
+      summary: List recipient lists
+      description: Get paginated list of recipient lists
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: account_id
+          in: query
+          schema:
+            type: string
+          description: Filter by account ID
+      responses:
+        '200':
+          description: Recipient lists retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecipientLists'
+    
+    post:
+      tags:
+        - Recipient Lists
+      summary: Create recipient list
+      description: Create a new recipient list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecipientListRequest'
+      responses:
+        '201':
+          description: Recipient list created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientList'
+
+  /recipient-lists/{list}:
+    get:
+      tags:
+        - Recipient Lists
+      summary: Get recipient list
+      description: Get recipient list details by ID
+      parameters:
+        - name: list
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Recipient list ID
+      responses:
+        '200':
+          description: Recipient list retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientList'
+    
+    put:
+      tags:
+        - Recipient Lists
+      summary: Update recipient list
+      description: Update recipient list details
+      parameters:
+        - name: list
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Recipient list ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRecipientListRequest'
+      responses:
+        '200':
+          description: Recipient list updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  list:
+                    $ref: '#/components/schemas/RecipientList'
+                  updated:
+                    type: boolean
+    
+    delete:
+      tags:
+        - Recipient Lists
+      summary: Delete recipient list
+      description: Delete a recipient list
+      parameters:
+        - name: list
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Recipient list ID
+      responses:
+        '200':
+          description: Recipient list deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+
+  /recipient-lists/{list}/recipients:
+    get:
+      tags:
+        - Recipient Lists
+      summary: List recipients in list
+      description: Get recipients associated with a list
+      parameters:
+        - name: list
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Recipient list ID
+      responses:
+        '200':
+          description: List recipients retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipient'
+    
+    put:
+      tags:
+        - Recipient Lists
+      summary: Update list recipients
+      description: Associate recipients with a list
+      parameters:
+        - name: list
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Recipient list ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipient_ids:
+                  type: array
+                  items:
+                    type: string
+                  example: ["1", "2", "3"]
+      responses:
+        '200':
+          description: List recipients updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+  /campaigns:
+    get:
+      tags:
+        - SMS Campaigns
+      summary: List SMS campaigns
+      description: Get paginated list of SMS campaigns with optional filtering
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: account_id
+          in: query
+          schema:
+            type: string
+          description: Filter by account ID
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search in campaign name and content
+      responses:
+        '200':
+          description: Campaigns retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCampaigns'
+    
+    post:
+      tags:
+        - SMS Campaigns
+      summary: Create SMS campaign
+      description: Create a new SMS campaign with recipients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCampaignRequest'
+      responses:
+        '200':
+          description: Campaign created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign:
+                    $ref: '#/components/schemas/SmsCampaign'
+                  messages_count:
+                    type: integer
+                    example: 150
+                    description: Number of SMS messages created for this campaign
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /campaigns/{campaign}:
+    get:
+      tags:
+        - SMS Campaigns
+      summary: Get SMS campaign
+      description: Get SMS campaign details by ID
+      parameters:
+        - name: campaign
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign ID
+      responses:
+        '200':
+          description: Campaign retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsCampaign'
+    
+    put:
+      tags:
+        - SMS Campaigns
+      summary: Update SMS campaign
+      description: Update SMS campaign details
+      parameters:
+        - name: campaign
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCampaignRequest'
+      responses:
+        '200':
+          description: Campaign updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign:
+                    $ref: '#/components/schemas/SmsCampaign'
+                  updated:
+                    type: boolean
+    
+    delete:
+      tags:
+        - SMS Campaigns
+      summary: Delete SMS campaign
+      description: Delete an SMS campaign
+      parameters:
+        - name: campaign
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Campaign ID
+      responses:
+        '200':
+          description: Campaign deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+
+  /messages:
+    get:
+      tags:
+        - SMS Messages
+      summary: List SMS messages
+      description: Get paginated list of SMS messages
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: campaign_id
+          in: query
+          schema:
+            type: string
+          description: Filter by campaign ID
+      responses:
+        '200':
+          description: Messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessages'
+
+  /messages/{message}:
+    get:
+      tags:
+        - SMS Messages
+      summary: Get SMS message
+      description: Get SMS message details by ID
+      parameters:
+        - name: message
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Message ID
+      responses:
+        '200':
+          description: Message retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsMessage'
+
+  /summary:
+    get:
+      tags:
+        - Analytics
+      summary: Get summary statistics
+      description: Get overall summary statistics for the account
+      parameters:
+        - name: account_id
+          in: query
+          schema:
+            type: string
+          description: Filter by account ID
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Start date for statistics
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date for statistics
+      responses:
+        '200':
+          description: Summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Summary'
+
+  /summary/success-rate:
+    get:
+      tags:
+        - Analytics
+      summary: Get success rate statistics
+      description: Get detailed success rate analytics
+      parameters:
+        - name: account_id
+          in: query
+          schema:
+            type: string
+          description: Filter by account ID
+        - name: date_from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Start date for statistics
+        - name: date_to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date for statistics
+      responses:
+        '200':
+          description: Success rate statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessRateStats'
+
+  /feedback-forms:
+    post:
+      tags:
+        - Feedback
+      summary: Submit feedback
+      description: Submit feedback form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '200':
+          description: Feedback submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Thank you for your feedback
+
+  /webhook/sms/iag:
+    post:
+      tags:
+        - Webhooks
+      summary: SMS IAG webhook
+      description: Webhook endpoint for SMS provider IAG status updates
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Webhook payload from SMS provider
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+  /incoming-mail/mg:
+    post:
+      tags:
+        - Webhooks
+      summary: Mailgun incoming mail webhook
+      description: Webhook endpoint for Mailgun incoming mail processing
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Mailgun webhook payload
+      responses:
+        '200':
+          description: Webhook processed successfully
+
+  /incoming-mail/pm:
+    post:
+      tags:
+        - Webhooks
+      summary: Postmark incoming mail webhook
+      description: Webhook endpoint for Postmark incoming mail processing
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Postmark webhook payload
+      responses:
+        '200':
+          description: Webhook processed successfully
+
+  /users/{user}/welcome:
+    post:
+      tags:
+        - Users
+      summary: Send welcome message
+      description: Send welcome message to user (signed route)
+      security: []
+      parameters:
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signature:
+                  type: string
+                  description: Signed URL signature
+      responses:
+        '200':
+          description: Welcome message sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+
+    Recipient:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        account_id:
+          type: string
+          example: "1"
+        number:
+          type: string
+          example: "+1234567890"
+          description: Phone number in international format
+        name:
+          type: string
+          example: John Doe
+          description: Recipient name
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    RecipientList:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        account_id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: VIP Customers
+        description:
+          type: string
+          nullable: true
+          example: High-value customers for special promotions
+        recipients_count:
+          type: integer
+          example: 150
+          description: Number of recipients in this list
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SmsCampaign:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        uid:
+          type: string
+          example: "abc123-def456-ghi789"
+          description: Unique identifier for external references
+        account_id:
+          type: string
+          example: "1"
+        user_id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: Summer Sale Campaign
+        type:
+          type: string
+          enum: [campaign, message]
+          example: campaign
+          description: Type of SMS campaign
+        content:
+          type: string
+          example: "Don't miss our summer sale! Get 20% off all items. Use code SUMMER20. Valid until July 31st."
+        marketing:
+          type: boolean
+          example: true
+          description: Whether this is a marketing campaign (affects compliance)
+        ready:
+          type: boolean
+          example: true
+          description: Whether campaign is ready for processing
+        began_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When campaign processing began
+        sent_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When campaign was completed
+        external_ids:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: External provider message IDs
+        messages_count:
+          type: integer
+          example: 150
+          description: Number of SMS messages in this campaign
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SmsMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        sms_campaign_id:
+          type: string
+          example: "1"
+        recipient_id:
+          type: string
+          nullable: true
+          example: "1"
+          description: Recipient ID (if sent to existing recipient)
+        number:
+          type: string
+          nullable: true
+          example: "+1234567890"
+          description: Phone number (if sent to ad-hoc number)
+        status:
+          type: string
+          enum: [pending, sent, delivered, failed, bounced]
+          example: delivered
+          description: Message delivery status
+        external_id:
+          type: string
+          nullable: true
+          example: "ext_msg_123456"
+          description: External provider message ID
+        error_message:
+          type: string
+          nullable: true
+          description: Error message if delivery failed
+        sent_at:
+          type: string
+          format: date-time
+          nullable: true
+        delivered_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    RecipientExport:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        account_id:
+          type: string
+          example: "1"
+        user_id:
+          type: string
+          example: "1"
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+          example: completed
+        format:
+          type: string
+          enum: [csv, xlsx]
+          example: csv
+        file_path:
+          type: string
+          nullable: true
+          example: "/exports/recipients_2023_01_01.csv"
+        download_url:
+          type: string
+          nullable: true
+          example: "https://api.example.com/downloads/recipients_2023_01_01.csv"
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Summary:
+      type: object
+      properties:
+        total_campaigns:
+          type: integer
+          example: 25
+        total_messages:
+          type: integer
+          example: 1500
+        total_recipients:
+          type: integer
+          example: 800
+        messages_sent:
+          type: integer
+          example: 1450
+        messages_delivered:
+          type: integer
+          example: 1420
+        messages_failed:
+          type: integer
+          example: 30
+        success_rate:
+          type: number
+          format: float
+          example: 97.9
+          description: Overall delivery success rate as percentage
+        period:
+          type: object
+          properties:
+            from:
+              type: string
+              format: date
+              example: "2023-01-01"
+            to:
+              type: string
+              format: date
+              example: "2023-12-31"
+
+    SuccessRateStats:
+      type: object
+      properties:
+        overall_success_rate:
+          type: number
+          format: float
+          example: 97.9
+        daily_stats:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+                example: "2023-06-20"
+              sent:
+                type: integer
+                example: 150
+              delivered:
+                type: integer
+                example: 147
+              failed:
+                type: integer
+                example: 3
+              success_rate:
+                type: number
+                format: float
+                example: 98.0
+        campaign_stats:
+          type: array
+          items:
+            type: object
+            properties:
+              campaign_id:
+                type: string
+                example: "1"
+              campaign_name:
+                type: string
+                example: Summer Sale Campaign
+              sent:
+                type: integer
+                example: 150
+              delivered:
+                type: integer
+                example: 147
+              failed:
+                type: integer
+                example: 3
+              success_rate:
+                type: number
+                format: float
+                example: 98.0
+
+    CreateRecipientListRequest:
+      type: object
+      required:
+        - name
+        - account_id
+      properties:
+        name:
+          type: string
+          example: VIP Customers
+        description:
+          type: string
+          nullable: true
+          example: High-value customers for special promotions
+        account_id:
+          type: string
+          example: "1"
+
+    UpdateRecipientListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: VIP Customers
+        description:
+          type: string
+          nullable: true
+          example: High-value customers for special promotions
+
+    CreateCampaignRequest:
+      type: object
+      required:
+        - name
+        - content
+        - account_id
+      properties:
+        name:
+          type: string
+          example: Summer Sale Campaign
+          maxLength: 255
+        content:
+          type: string
+          example: "Don't miss our summer sale! Get 20% off all items. Use code SUMMER20. Valid until July 31st."
+          description: SMS message content
+        type:
+          type: string
+          enum: [campaign, message]
+          default: campaign
+          example: campaign
+        account_id:
+          type: string
+          example: "1"
+        recipients:
+          type: array
+          items:
+            type: string
+          example: ["1", "2", "3"]
+          description: Array of recipient IDs (required if lists and numbers not provided)
+        lists:
+          type: array
+          items:
+            type: string
+          example: ["1", "2"]
+          description: Array of recipient list IDs (required if recipients and numbers not provided)
+        numbers:
+          type: array
+          items:
+            type: string
+          example: ["+1234567890", "+1987654321"]
+          description: Array of phone numbers (required if recipients and lists not provided)
+        marketing:
+          type: boolean
+          default: false
+          example: true
+          description: Whether this is a marketing campaign
+
+    UpdateCampaignRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Summer Sale Campaign Updated
+          maxLength: 255
+        content:
+          type: string
+          example: "Updated: Don't miss our summer sale! Get 25% off all items. Use code SUMMER25."
+        type:
+          type: string
+          enum: [campaign, message]
+          example: campaign
+        marketing:
+          type: boolean
+          example: true
+
+    FeedbackRequest:
+      type: object
+      required:
+        - subject
+        - message
+        - email
+      properties:
+        subject:
+          type: string
+          example: Feature Request
+        message:
+          type: string
+          example: It would be great to have scheduling functionality for campaigns.
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          type: string
+          example: John Doe
+
+    PaginatedRecipientLists:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecipientList'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    PaginatedCampaigns:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SmsCampaign'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+    PaginatedMessages:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SmsMessage'
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+tags:
+  - name: Authentication
+    description: User authentication and password management
+  - name: Users
+    description: User management operations
+  - name: Organizations
+    description: Organization management operations
+  - name: Accounts
+    description: Account management operations
+  - name: Recipients
+    description: Recipient and contact management
+  - name: Recipient Lists
+    description: Recipient list management
+  - name: SMS Campaigns
+    description: SMS campaign creation and management
+  - name: SMS Messages
+    description: Individual SMS message tracking
+  - name: Analytics
+    description: Campaign analytics and reporting
+  - name: Feedback
+    description: User feedback submission
+  - name: Webhooks
+    description: External system webhooks and integrations
+
