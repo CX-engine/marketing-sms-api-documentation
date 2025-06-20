@@ -60,6 +60,11 @@ function App() {
     const element = document.getElementById(`${categoryId}-endpoint-${endpointIndex}`)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // Highlight the endpoint briefly
+      element.classList.add('ring-2', 'ring-blue-500', 'ring-opacity-50')
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-blue-500', 'ring-opacity-50')
+      }, 2000)
     }
   }
 
@@ -908,8 +913,17 @@ function App() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/cx-engine-logo.svg+xml" 
+                  alt="CX Engine" 
+                  className="h-8 w-auto"
+                  onError={(e) => {
+                    e.target.style.display = 'none'
+                    e.target.nextSibling.style.display = 'flex'
+                  }}
+                />
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center" style={{display: 'none'}}>
                   <MessageSquare className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -923,7 +937,7 @@ function App() {
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                 v1.0.0
               </Badge>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700">
                 <ExternalLink className="h-4 w-4 mr-2" />
                 OpenAPI Spec
               </Button>
@@ -975,54 +989,56 @@ function App() {
                   <CardTitle className="text-sm">Categories</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {endpoints.map((category) => {
-                    const Icon = category.icon
-                    const isOpen = openCategories[category.id]
-                    return (
-                      <Collapsible
-                        key={category.id}
-                        open={isOpen}
-                        onOpenChange={() => toggleCategory(category.id)}
-                      >
-                        <CollapsibleTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start h-auto p-3"
-                          >
-                            <div className={`w-2 h-2 rounded-full mr-3 ${category.color}`}></div>
-                            <Icon className="h-4 w-4 mr-2" />
-                            <span className="text-sm flex-1 text-left">{category.category}</span>
-                            <Badge variant="secondary" className="mr-2">
-                              {category.endpoints.length}
-                            </Badge>
-                            {isOpen ? (
-                              <ChevronDown className="h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="space-y-1 ml-6 mt-2">
-                          {category.endpoints.map((endpoint, index) => (
+                  <ScrollArea className="h-[400px] pr-4">
+                    {endpoints.map((category) => {
+                      const Icon = category.icon
+                      const isOpen = openCategories[category.id]
+                      return (
+                        <Collapsible
+                          key={category.id}
+                          open={isOpen}
+                          onOpenChange={() => toggleCategory(category.id)}
+                        >
+                          <CollapsibleTrigger asChild>
                             <Button
-                              key={index}
                               variant="ghost"
-                              size="sm"
-                              className="w-full justify-start text-xs h-8 pl-4"
-                              onClick={() => scrollToEndpoint(category.id, index)}
+                              className="w-full justify-start h-auto p-3 mb-1"
                             >
-                              <Badge 
-                                className={`${getMethodColor(endpoint.method)} mr-2 text-xs px-1 py-0`}
-                              >
-                                {endpoint.method}
+                              <div className={`w-2 h-2 rounded-full mr-3 ${category.color}`}></div>
+                              <Icon className="h-4 w-4 mr-2" />
+                              <span className="text-sm flex-1 text-left">{category.category}</span>
+                              <Badge variant="secondary" className="mr-2">
+                                {category.endpoints.length}
                               </Badge>
-                              <span className="truncate">{endpoint.title}</span>
+                              {isOpen ? (
+                                <ChevronDown className="h-4 w-4" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4" />
+                              )}
                             </Button>
-                          ))}
-                        </CollapsibleContent>
-                      </Collapsible>
-                    )
-                  })}
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="space-y-1 ml-6 mt-2 mb-2">
+                            {category.endpoints.map((endpoint, index) => (
+                              <Button
+                                key={index}
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-xs h-8 pl-4 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                onClick={() => scrollToEndpoint(category.id, index)}
+                              >
+                                <Badge 
+                                  className={`${getMethodColor(endpoint.method)} mr-2 text-xs px-1 py-0`}
+                                >
+                                  {endpoint.method}
+                                </Badge>
+                                <span className="truncate">{endpoint.title}</span>
+                              </Button>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      )
+                    })}
+                  </ScrollArea>
                 </CardContent>
               </Card>
             </div>
@@ -1045,23 +1061,29 @@ function App() {
 
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="text-center">
+              <Card className="text-center border-blue-200 hover:border-blue-300 transition-colors">
                 <CardContent className="pt-6">
-                  <Shield className="h-8 w-8 mx-auto mb-4 text-blue-600" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Shield className="h-6 w-6 text-blue-600" />
+                  </div>
                   <h3 className="font-semibold mb-2">Secure Authentication</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">OAuth2 with personal access tokens</p>
                 </CardContent>
               </Card>
-              <Card className="text-center">
+              <Card className="text-center border-green-200 hover:border-green-300 transition-colors">
                 <CardContent className="pt-6">
-                  <Globe className="h-8 w-8 mx-auto mb-4 text-green-600" />
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Globe className="h-6 w-6 text-green-600" />
+                  </div>
                   <h3 className="font-semibold mb-2">Global Reach</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">International phone number support</p>
                 </CardContent>
               </Card>
-              <Card className="text-center">
+              <Card className="text-center border-purple-200 hover:border-purple-300 transition-colors">
                 <CardContent className="pt-6">
-                  <BarChart3 className="h-8 w-8 mx-auto mb-4 text-purple-600" />
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="h-6 w-6 text-purple-600" />
+                  </div>
                   <h3 className="font-semibold mb-2">Real-time Analytics</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Track delivery and success rates</p>
                 </CardContent>
@@ -1087,7 +1109,7 @@ function App() {
 
                   <div className="space-y-6">
                     {category.endpoints.map((endpoint, index) => (
-                      <Card key={index} id={`${category.id}-endpoint-${index}`} className="overflow-hidden">
+                      <Card key={index} id={`${category.id}-endpoint-${index}`} className="overflow-hidden transition-all duration-200">
                         <CardHeader className="bg-gray-50 dark:bg-gray-800/50">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
@@ -1196,7 +1218,7 @@ console.log(data);`}
             })}
 
             {/* Getting Started Section */}
-            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Book className="h-5 w-5" />
@@ -1244,7 +1266,16 @@ console.log(data);`}
         <div className="container mx-auto px-4 py-8">
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-6 h-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded flex items-center justify-center">
+              <img 
+                src="/cx-engine-logo.svg+xml" 
+                alt="CX Engine" 
+                className="h-6 w-auto"
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                  e.target.nextSibling.style.display = 'flex'
+                }}
+              />
+              <div className="w-6 h-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded flex items-center justify-center" style={{display: 'none'}}>
                 <MessageSquare className="h-4 w-4 text-white" />
               </div>
               <span className="font-semibold">SMS Marketing API</span>
@@ -1253,9 +1284,9 @@ console.log(data);`}
               Built with ❤️ for developers. Need help? Contact our support team.
             </p>
             <div className="flex items-center justify-center space-x-4">
-              <Button variant="ghost" size="sm">Documentation</Button>
-              <Button variant="ghost" size="sm">Support</Button>
-              <Button variant="ghost" size="sm">Status</Button>
+              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">Documentation</Button>
+              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">Support</Button>
+              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">Status</Button>
             </div>
           </div>
         </div>
