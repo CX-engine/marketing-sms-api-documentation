@@ -77,7 +77,7 @@ function App() {
       endpoints: [
         {
           method: 'POST',
-          path: '/api/login',
+          path: '/login',
           title: 'User Login',
           description: 'Authenticate user and receive access token',
           requestBody: {
@@ -91,7 +91,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/logout',
+          path: '/logout',
           title: 'User Logout',
           description: 'Revoke current access token',
           requiresAuth: true,
@@ -101,7 +101,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/password-reset-request',
+          path: '/password-reset-request',
           title: 'Request Password Reset',
           description: 'Send password reset link to user email',
           requestBody: {
@@ -114,7 +114,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/password-reset',
+          path: '/password-reset',
           title: 'Reset Password',
           description: 'Reset user password using token from email',
           requestBody: {
@@ -137,7 +137,7 @@ function App() {
       endpoints: [
         {
           method: 'GET',
-          path: '/api/users',
+          path: '/users',
           title: 'List Users',
           description: 'Get paginated list of users',
           requiresAuth: true,
@@ -153,7 +153,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/users',
+          path: '/users',
           title: 'Create User',
           description: 'Create a new user',
           requiresAuth: true,
@@ -172,7 +172,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/users/{user}',
+          path: '/users/{user}',
           title: 'Get User',
           description: 'Get user details by ID',
           requiresAuth: true,
@@ -185,7 +185,7 @@ function App() {
         },
         {
           method: 'PUT',
-          path: '/api/users/{user}',
+          path: '/users/{user}',
           title: 'Update User',
           description: 'Update user details',
           requiresAuth: true,
@@ -200,7 +200,7 @@ function App() {
         },
         {
           method: 'DELETE',
-          path: '/api/users/{user}',
+          path: '/users/{user}',
           title: 'Delete User',
           description: 'Delete a user',
           requiresAuth: true,
@@ -210,7 +210,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/users/{user}/welcome',
+          path: '/users/{user}/welcome',
           title: 'Send Welcome Message',
           description: 'Send welcome message to user (signed route)',
           requestBody: {
@@ -230,7 +230,7 @@ function App() {
       endpoints: [
         {
           method: 'GET',
-          path: '/api/organisations',
+          path: '/organisations',
           title: 'List Organizations',
           description: 'Get paginated list of organizations',
           requiresAuth: true,
@@ -242,7 +242,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/organisations',
+          path: '/organisations',
           title: 'Create Organization',
           description: 'Create a new organization',
           requiresAuth: true,
@@ -256,7 +256,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/organisations/{organisation}',
+          path: '/organisations/{organisation}',
           title: 'Get Organization',
           description: 'Get organization details by ID',
           requiresAuth: true,
@@ -267,7 +267,7 @@ function App() {
         },
         {
           method: 'PUT',
-          path: '/api/organisations/{organisation}',
+          path: '/organisations/{organisation}',
           title: 'Update Organization',
           description: 'Update organization details',
           requiresAuth: true,
@@ -281,7 +281,7 @@ function App() {
         },
         {
           method: 'DELETE',
-          path: '/api/organisations/{organisation}',
+          path: '/organisations/{organisation}',
           title: 'Delete Organization',
           description: 'Delete an organization',
           requiresAuth: true,
@@ -299,7 +299,7 @@ function App() {
       endpoints: [
         {
           method: 'GET',
-          path: '/api/accounts',
+          path: '/accounts',
           title: 'List Accounts',
           description: 'Get paginated list of accounts',
           requiresAuth: true,
@@ -311,7 +311,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/accounts',
+          path: '/accounts',
           title: 'Create Account',
           description: 'Create a new account',
           requiresAuth: true,
@@ -326,7 +326,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/accounts/{account}',
+          path: '/accounts/{account}',
           title: 'Get Account',
           description: 'Get account details by ID',
           requiresAuth: true,
@@ -337,7 +337,7 @@ function App() {
         },
         {
           method: 'PUT',
-          path: '/api/accounts/{account}',
+          path: '/accounts/{account}',
           title: 'Update Account',
           description: 'Update account details',
           requiresAuth: true,
@@ -351,7 +351,7 @@ function App() {
         },
         {
           method: 'DELETE',
-          path: '/api/accounts/{account}',
+          path: '/accounts/{account}',
           title: 'Delete Account',
           description: 'Delete an account',
           requiresAuth: true,
@@ -361,7 +361,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/accounts/{account}/users',
+          path: '/accounts/{account}/users',
           title: 'List Account Users',
           description: 'Get users associated with an account',
           requiresAuth: true,
@@ -371,7 +371,7 @@ function App() {
         },
         {
           method: 'PUT',
-          path: '/api/accounts/{account}/users',
+          path: '/accounts/{account}/users',
           title: 'Update Account Users',
           description: 'Associate users with an account',
           requiresAuth: true,
@@ -392,7 +392,7 @@ function App() {
       endpoints: [
         {
           method: 'GET',
-          path: '/api/recipients',
+          path: '/recipients',
           title: 'List Recipients',
           description: 'Get list of recipients with optional filtering',
           requiresAuth: true,
@@ -415,7 +415,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/recipients',
+          path: '/recipients',
           title: 'Create Recipients',
           description: 'Create one or more recipients',
           requiresAuth: true,
@@ -436,7 +436,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/recipients/{recipient}',
+          path: '/recipients/{recipient}',
           title: 'Get Recipient',
           description: 'Get recipient details by ID',
           requiresAuth: true,
@@ -448,7 +448,7 @@ function App() {
         },
         {
           method: 'PUT',
-          path: '/api/recipients/{recipient}',
+          path: '/recipients/{recipient}',
           title: 'Update Recipient',
           description: 'Update recipient details',
           requiresAuth: true,
@@ -463,7 +463,7 @@ function App() {
         },
         {
           method: 'DELETE',
-          path: '/api/recipients/{recipient}',
+          path: '/recipients/{recipient}',
           title: 'Delete Recipient',
           description: 'Delete a recipient',
           requiresAuth: true,
@@ -473,7 +473,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/recipients-export',
+          path: '/recipients-export',
           title: 'List Recipient Exports',
           description: 'Get list of recipient export jobs',
           requiresAuth: true,
@@ -483,7 +483,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/recipients-export',
+          path: '/recipients-export',
           title: 'Create Recipient Export',
           description: 'Create a new recipient export job',
           requiresAuth: true,
@@ -506,7 +506,7 @@ function App() {
       endpoints: [
         {
           method: 'GET',
-          path: '/api/recipient-lists',
+          path: '/recipient-lists',
           title: 'List Recipient Lists',
           description: 'Get paginated list of recipient lists',
           requiresAuth: true,
@@ -518,7 +518,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/recipient-lists',
+          path: '/recipient-lists',
           title: 'Create Recipient List',
           description: 'Create a new recipient list',
           requiresAuth: true,
@@ -534,7 +534,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/recipient-lists/{list}',
+          path: '/recipient-lists/{list}',
           title: 'Get Recipient List',
           description: 'Get recipient list details by ID',
           requiresAuth: true,
@@ -546,7 +546,7 @@ function App() {
         },
         {
           method: 'PUT',
-          path: '/api/recipient-lists/{list}',
+          path: '/recipient-lists/{list}',
           title: 'Update Recipient List',
           description: 'Update recipient list details',
           requiresAuth: true,
@@ -560,7 +560,7 @@ function App() {
         },
         {
           method: 'DELETE',
-          path: '/api/recipient-lists/{list}',
+          path: '/recipient-lists/{list}',
           title: 'Delete Recipient List',
           description: 'Delete a recipient list',
           requiresAuth: true,
@@ -570,7 +570,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/recipient-lists/{list}/recipients',
+          path: '/recipient-lists/{list}/recipients',
           title: 'List Recipients in List',
           description: 'Get recipients associated with a list',
           requiresAuth: true,
@@ -580,7 +580,7 @@ function App() {
         },
         {
           method: 'PUT',
-          path: '/api/recipient-lists/{list}/recipients',
+          path: '/recipient-lists/{list}/recipients',
           title: 'Update List Recipients',
           description: 'Associate recipients with a list',
           requiresAuth: true,
@@ -601,7 +601,7 @@ function App() {
       endpoints: [
         {
           method: 'GET',
-          path: '/api/campaigns',
+          path: '/campaigns',
           title: 'List Campaigns',
           description: 'Get paginated list of SMS campaigns',
           requiresAuth: true,
@@ -629,7 +629,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/campaigns',
+          path: '/campaigns',
           title: 'Create Campaign',
           description: 'Create a new SMS campaign with recipients',
           requiresAuth: true,
@@ -655,7 +655,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/campaigns/{campaign}',
+          path: '/campaigns/{campaign}',
           title: 'Get Campaign',
           description: 'Get SMS campaign details by ID',
           requiresAuth: true,
@@ -667,7 +667,7 @@ function App() {
         },
         {
           method: 'PUT',
-          path: '/api/campaigns/{campaign}',
+          path: '/campaigns/{campaign}',
           title: 'Update Campaign',
           description: 'Update SMS campaign details',
           requiresAuth: true,
@@ -681,7 +681,7 @@ function App() {
         },
         {
           method: 'DELETE',
-          path: '/api/campaigns/{campaign}',
+          path: '/campaigns/{campaign}',
           title: 'Delete Campaign',
           description: 'Delete an SMS campaign',
           requiresAuth: true,
@@ -699,7 +699,7 @@ function App() {
       endpoints: [
         {
           method: 'GET',
-          path: '/api/messages',
+          path: '/messages',
           title: 'List SMS Messages',
           description: 'Get paginated list of SMS messages',
           requiresAuth: true,
@@ -724,7 +724,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/messages/{message}',
+          path: '/messages/{message}',
           title: 'Get SMS Message',
           description: 'Get SMS message details by ID',
           requiresAuth: true,
@@ -745,7 +745,7 @@ function App() {
       endpoints: [
         {
           method: 'GET',
-          path: '/api/summary',
+          path: '/summary',
           title: 'Get Summary',
           description: 'Get overall summary statistics',
           requiresAuth: true,
@@ -765,7 +765,7 @@ function App() {
         },
         {
           method: 'GET',
-          path: '/api/summary/success-rate',
+          path: '/summary/success-rate',
           title: 'Get Success Rate Statistics',
           description: 'Get detailed success rate analytics',
           requiresAuth: true,
@@ -796,7 +796,7 @@ function App() {
       endpoints: [
         {
           method: 'POST',
-          path: '/api/webhook/sms/iag',
+          path: '/webhook/sms/iag',
           title: 'SMS IAG Webhook',
           description: 'Webhook endpoint for SMS provider IAG status updates',
           requestBody: {
@@ -810,7 +810,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/incoming-mail/mg',
+          path: '/incoming-mail/mg',
           title: 'Mailgun Incoming Mail',
           description: 'Webhook endpoint for Mailgun incoming mail processing',
           requestBody: {
@@ -824,7 +824,7 @@ function App() {
         },
         {
           method: 'POST',
-          path: '/api/incoming-mail/pm',
+          path: '/incoming-mail/pm',
           title: 'Postmark Incoming Mail',
           description: 'Webhook endpoint for Postmark incoming mail processing',
           requestBody: {
@@ -846,7 +846,7 @@ function App() {
       endpoints: [
         {
           method: 'POST',
-          path: '/api/feedback-forms',
+          path: '/feedback-forms',
           title: 'Submit Feedback',
           description: 'Submit feedback form',
           requiresAuth: true,
@@ -1144,7 +1144,7 @@ function App() {
                                 <CodeBlock
                                   id={`curl-${category.id}-${index}`}
                                   language="bash"
-                                  code={`curl -X ${endpoint.method} "https://sms.cx-engine.com/api${endpoint.path}" \\
+                                  code={`curl -X ${endpoint.method} "https://sms.encom.tel/api${endpoint.path}" \\
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\
   -H "Content-Type: application/json"${endpoint.requestBody ? ` \\
   -d '${JSON.stringify(endpoint.requestBody, null, 2)}'` : ''}`}
@@ -1156,7 +1156,7 @@ function App() {
                                 <CodeBlock
                                   id={`js-${category.id}-${index}`}
                                   language="javascript"
-                                  code={`const response = await fetch('https://sms.cx-engine.com/api${endpoint.path}', {
+                                  code={`const response = await fetch('https://sms.encom.tel/api${endpoint.path}', {
   method: '${endpoint.method}',
   headers: {
     'Authorization': 'Bearer YOUR_ACCESS_TOKEN',

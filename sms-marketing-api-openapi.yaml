@@ -25,9 +25,9 @@ info:
     name: Proprietary
     
 servers:
-  - url: https://sms.cx-engine.com/api
+  - url: https://sms.encom.tel/api
     description: Production server
-  - url: https://staging-sms.cx-engine.com/api
+  - url: https://staging-sms.encom.tel/api
     description: Staging server
 
 security:
