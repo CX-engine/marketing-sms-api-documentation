@@ -915,7 +915,7 @@ function App() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
                 <img 
-                  src="/cx-engine-logo.svg+xml" 
+                  src="/cx-engine-logo.svg" 
                   alt="CX Engine" 
                   className="h-8 w-auto"
                   onError={(e) => {
@@ -1267,7 +1267,7 @@ console.log(data);`}
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center space-x-2">
               <img 
-                src="/cx-engine-logo.svg+xml" 
+                src="/cx-engine-logo.svg" 
                 alt="CX Engine" 
                 className="h-6 w-auto"
                 onError={(e) => {
