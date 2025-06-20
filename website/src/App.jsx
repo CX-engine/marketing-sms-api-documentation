@@ -913,24 +913,24 @@ function App() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <img 
-                  src="/cx-engine-logo.svg" 
-                  alt="CX Engine" 
-                  className="h-8 w-auto"
-                  onError={(e) => {
-                    e.target.style.display = 'none'
-                    e.target.nextSibling.style.display = 'flex'
-                  }}
-                />
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center" style={{display: 'none'}}>
-                  <MessageSquare className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold">SMS Marketing API</h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Comprehensive API Documentation</p>
-                </div>
+            <div className="flex items-center space-x-6">
+              <img 
+                src="/cx-engine-logo.svg" 
+                alt="CX Engine" 
+                className="h-8 w-auto"
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                  e.target.nextSibling.style.display = 'flex'
+                }}
+              />
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center" style={{display: 'none'}}>
+                <MessageSquare className="h-5 w-5 text-white" />
               </div>
+              <div>
+                <h1 className="text-xl font-bold">SMS Marketing API</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Comprehensive API Documentation</p>
+              </div>
+            </div>
             </div>
             <div className="flex items-center space-x-4">
               <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
@@ -1146,7 +1146,7 @@ function App() {
                                 <CodeBlock
                                   id={`curl-${category.id}-${index}`}
                                   language="bash"
-                                  code={`curl -X ${endpoint.method} "https://api.your-domain.com${endpoint.path}" \\
+                                  code={`curl -X ${endpoint.method} "https://sms.cx-engine.com/api${endpoint.path}" \\
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\
   -H "Content-Type: application/json"${endpoint.requestBody ? ` \\
   -d '${JSON.stringify(endpoint.requestBody, null, 2)}'` : ''}`}
@@ -1158,7 +1158,7 @@ function App() {
                                 <CodeBlock
                                   id={`js-${category.id}-${index}`}
                                   language="javascript"
-                                  code={`const response = await fetch('https://api.your-domain.com${endpoint.path}', {
+                                  code={`const response = await fetch('https://sms.cx-engine.com/api${endpoint.path}', {
   method: '${endpoint.method}',
   headers: {
     'Authorization': 'Bearer YOUR_ACCESS_TOKEN',

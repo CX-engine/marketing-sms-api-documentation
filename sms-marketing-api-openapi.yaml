@@ -25,9 +25,9 @@ info:
     name: Proprietary
     
 servers:
-  - url: https://api.your-domain.com/api
+  - url: https://sms.cx-engine.com/api
     description: Production server
-  - url: https://staging-api.your-domain.com/api
+  - url: https://staging-sms.cx-engine.com/api
     description: Staging server
 
 security:
