@@ -912,8 +912,7 @@ function App() {
       <header className="border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center">
               <img 
                 src="/cx-engine-logo.svg" 
                 alt="CX Engine" 
@@ -926,11 +925,10 @@ function App() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center" style={{display: 'none'}}>
                 <MessageSquare className="h-5 w-5 text-white" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold">SMS Marketing API</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Comprehensive API Documentation</p>
-              </div>
             </div>
+            <div className="flex-1 ml-8">
+              <h1 className="text-xl font-bold">SMS API</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Comprehensive API Documentation</p>
             </div>
             <div className="flex items-center space-x-4">
               <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
@@ -1050,7 +1048,7 @@ function App() {
             <div className="text-center space-y-4 py-8">
               <div className="inline-flex items-center space-x-2 bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-full">
                 <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Powerful SMS Marketing Platform</span>
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Powerful SMS Platform</span>
               </div>
               <h2 className="text-3xl font-bold">Complete API Reference</h2>
               <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
@@ -1225,7 +1223,7 @@ console.log(data);`}
                   <span>Getting Started</span>
                 </CardTitle>
                 <CardDescription>
-                  Quick guide to start using the SMS Marketing API
+                  Quick guide to start using the SMS API
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -1278,7 +1276,7 @@ console.log(data);`}
               <div className="w-6 h-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded flex items-center justify-center" style={{display: 'none'}}>
                 <MessageSquare className="h-4 w-4 text-white" />
               </div>
-              <span className="font-semibold">SMS Marketing API</span>
+              <span className="font-semibold">SMS API</span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Built with ❤️ for developers. Need help? Contact our support team.

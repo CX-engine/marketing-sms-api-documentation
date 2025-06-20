@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: SMS Marketing API
+  title: SMS API
   description: |
     A comprehensive SMS marketing API that allows users to manage SMS campaigns, recipients, and organizations. 
     
