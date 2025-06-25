@@ -7,14 +7,14 @@ import { ScrollArea } from '@/components/ui/scroll-area.jsx'
 import { Separator } from '@/components/ui/separator.jsx'
 import { Input } from '@/components/ui/input.jsx'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible.jsx'
-import { 
-  Search, 
-  Send, 
-  Users, 
-  Building2, 
-  MessageSquare, 
-  BarChart3, 
-  Settings, 
+import {
+  Search,
+  Send,
+  Users,
+  Building2,
+  MessageSquare,
+  BarChart3,
+  Settings,
   Key,
   ChevronRight,
   ChevronDown,
@@ -211,10 +211,13 @@ function App() {
         {
           method: 'POST',
           path: '/users/{user}/welcome',
-          title: 'Send Welcome Message',
-          description: 'Send welcome message to user (signed route)',
-          requestBody: {
+          title: 'Complete Welcome Process',
+          description: 'Set the user password from the welcome email (signed route)',
+          queryParams: {
             signature: 'signed_url_signature'
+          },
+          requestBody: {
+            password: 'password123'
           },
           response: {
             success: true
@@ -789,56 +792,6 @@ function App() {
       ]
     },
     {
-      id: 'webhooks',
-      category: 'Webhooks',
-      icon: Webhook,
-      color: 'bg-red-500',
-      endpoints: [
-        {
-          method: 'POST',
-          path: '/webhook/sms/iag',
-          title: 'SMS IAG Webhook',
-          description: 'Webhook endpoint for SMS provider IAG status updates',
-          requestBody: {
-            message_id: 'ext_msg_123456',
-            status: 'delivered',
-            timestamp: '2023-06-20T10:00:00Z'
-          },
-          response: {
-            success: true
-          }
-        },
-        {
-          method: 'POST',
-          path: '/incoming-mail/mg',
-          title: 'Mailgun Incoming Mail',
-          description: 'Webhook endpoint for Mailgun incoming mail processing',
-          requestBody: {
-            sender: 'user@example.com',
-            subject: 'SMS Campaign Request',
-            body: 'Please send SMS to my list'
-          },
-          response: {
-            success: true
-          }
-        },
-        {
-          method: 'POST',
-          path: '/incoming-mail/pm',
-          title: 'Postmark Incoming Mail',
-          description: 'Webhook endpoint for Postmark incoming mail processing',
-          requestBody: {
-            From: 'user@example.com',
-            Subject: 'SMS Campaign Request',
-            TextBody: 'Please send SMS to my list'
-          },
-          response: {
-            success: true
-          }
-        }
-      ]
-    },
-    {
       id: 'feedback',
       category: 'Feedback',
       icon: Mail,
@@ -889,18 +842,18 @@ function App() {
 
   const CodeBlock = ({ code, language = 'json', id }) => (
     <div className="relative">
-      <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-t-lg">
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-100 rounded-t-lg dark:bg-gray-800">
         <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{language}</span>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => copyToClipboard(code, id)}
-          className="h-6 w-6 p-0"
+          className="w-6 h-6 p-0"
         >
-          {copiedCode === id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+          {copiedCode === id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
         </Button>
       </div>
-      <pre className="bg-gray-50 dark:bg-gray-900 p-4 rounded-b-lg overflow-x-auto">
+      <pre className="p-4 overflow-x-auto rounded-b-lg bg-gray-50 dark:bg-gray-900">
         <code className="text-sm">{code}</code>
       </pre>
     </div>
@@ -909,21 +862,21 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80">
+        <div className="container px-4 py-4 mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <img 
-                src="/cx-engine-logo.svg" 
-                alt="CX Engine" 
-                className="h-8 w-auto"
+              <img
+                src="/cx-engine-logo.svg"
+                alt="CX Engine"
+                className="w-auto h-8"
                 onError={(e) => {
                   e.target.style.display = 'none'
                   e.target.nextSibling.style.display = 'flex'
                 }}
               />
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center" style={{display: 'none'}}>
-                <MessageSquare className="h-5 w-5 text-white" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600" style={{display: 'none'}}>
+                <MessageSquare className="w-5 h-5 text-white" />
               </div>
             </div>
             <div className="flex-1 ml-8">
@@ -931,12 +884,12 @@ function App() {
               <p className="text-sm text-gray-600 dark:text-gray-400">Comprehensive API Documentation</p>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+              <Badge variant="secondary" className="text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300">
+                <div className="w-2 h-2 mr-2 bg-green-500 rounded-full"></div>
                 v1.0.0
               </Badge>
-              <Button variant="outline" size="sm" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700">
-                <ExternalLink className="h-4 w-4 mr-2" />
+              <Button variant="outline" size="sm" className="text-white bg-blue-600 border-blue-600 hover:bg-blue-700">
+                <ExternalLink className="w-4 h-4 mr-2" />
                 OpenAPI Spec
               </Button>
             </div>
@@ -944,14 +897,14 @@ function App() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="container px-4 py-8 mx-auto">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 space-y-6">
+            <div className="sticky space-y-6 top-24">
               {/* Search */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute w-4 h-4 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
                 <Input
                   placeholder="Search endpoints..."
                   value={searchTerm}
@@ -960,9 +913,68 @@ function App() {
                 />
               </div>
 
+              {/* Navigation */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Categories</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <ScrollArea className="h-[400px] pr-4">
+                    {endpoints.map((category) => {
+                      const Icon = category.icon
+                      const isOpen = openCategories[category.id]
+                      return (
+                        <Collapsible
+                          key={category.id}
+                          open={isOpen}
+                          onOpenChange={() => toggleCategory(category.id)}
+                        >
+                          <CollapsibleTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className="justify-start w-full h-auto p-3 mb-1"
+                            >
+                              <div className={`w-2 h-2 rounded-full mr-3 ${category.color}`}></div>
+                              <Icon className="w-4 h-4 mr-2" />
+                              <span className="flex-1 text-sm text-left">{category.category}</span>
+                              <Badge variant="secondary" className="mr-2">
+                                {category.endpoints.length}
+                              </Badge>
+                              {isOpen ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
+                            </Button>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="mt-2 mb-2 ml-6 space-y-1">
+                            {category.endpoints.map((endpoint, index) => (
+                              <Button
+                                key={index}
+                                variant="ghost"
+                                size="sm"
+                                className="justify-start w-full h-8 pl-4 text-xs hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                onClick={() => scrollToEndpoint(category.id, index)}
+                              >
+                                <Badge
+                                  className={`${getMethodColor(endpoint.method)} mr-2 text-xs px-1 py-0`}
+                                >
+                                  {endpoint.method}
+                                </Badge>
+                                <span className="truncate">{endpoint.title}</span>
+                              </Button>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      )
+                    })}
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+
               {/* Quick Stats */}
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2">
                   <CardTitle className="text-sm">API Overview</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -980,109 +992,50 @@ function App() {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Navigation */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">Categories</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <ScrollArea className="h-[400px] pr-4">
-                    {endpoints.map((category) => {
-                      const Icon = category.icon
-                      const isOpen = openCategories[category.id]
-                      return (
-                        <Collapsible
-                          key={category.id}
-                          open={isOpen}
-                          onOpenChange={() => toggleCategory(category.id)}
-                        >
-                          <CollapsibleTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start h-auto p-3 mb-1"
-                            >
-                              <div className={`w-2 h-2 rounded-full mr-3 ${category.color}`}></div>
-                              <Icon className="h-4 w-4 mr-2" />
-                              <span className="text-sm flex-1 text-left">{category.category}</span>
-                              <Badge variant="secondary" className="mr-2">
-                                {category.endpoints.length}
-                              </Badge>
-                              {isOpen ? (
-                                <ChevronDown className="h-4 w-4" />
-                              ) : (
-                                <ChevronRight className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="space-y-1 ml-6 mt-2 mb-2">
-                            {category.endpoints.map((endpoint, index) => (
-                              <Button
-                                key={index}
-                                variant="ghost"
-                                size="sm"
-                                className="w-full justify-start text-xs h-8 pl-4 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                                onClick={() => scrollToEndpoint(category.id, index)}
-                              >
-                                <Badge 
-                                  className={`${getMethodColor(endpoint.method)} mr-2 text-xs px-1 py-0`}
-                                >
-                                  {endpoint.method}
-                                </Badge>
-                                <span className="truncate">{endpoint.title}</span>
-                              </Button>
-                            ))}
-                          </CollapsibleContent>
-                        </Collapsible>
-                      )
-                    })}
-                  </ScrollArea>
-                </CardContent>
-              </Card>
             </div>
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3 space-y-8">
+          <div className="space-y-8 lg:col-span-3">
             {/* Hero Section */}
-            <div className="text-center space-y-4 py-8">
-              <div className="inline-flex items-center space-x-2 bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-full">
-                <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <div className="py-8 space-y-4 text-center">
+              <div className="inline-flex items-center px-4 py-2 space-x-2 bg-blue-100 rounded-full dark:bg-blue-900">
+                <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Powerful SMS Platform</span>
               </div>
               <h2 className="text-3xl font-bold">Complete API Reference</h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                Integrate SMS marketing capabilities into your applications with our comprehensive REST API. 
+              <p className="max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">
+                Integrate SMS marketing capabilities into your applications with our comprehensive REST API.
                 Manage campaigns, recipients, and track analytics with ease.
               </p>
             </div>
 
             {/* Features Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card className="text-center border-blue-200 hover:border-blue-300 transition-colors">
+            <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
+              <Card className="text-center transition-colors border-blue-200 hover:border-blue-300">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Shield className="h-6 w-6 text-blue-600" />
+                  <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-lg">
+                    <Shield className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Secure Authentication</h3>
+                  <h3 className="mb-2 font-semibold">Secure Authentication</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">OAuth2 with personal access tokens</p>
                 </CardContent>
               </Card>
-              <Card className="text-center border-green-200 hover:border-green-300 transition-colors">
+              <Card className="text-center transition-colors border-green-200 hover:border-green-300">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Globe className="h-6 w-6 text-green-600" />
+                  <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-green-100 rounded-lg">
+                    <Globe className="w-6 h-6 text-green-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Global Reach</h3>
+                  <h3 className="mb-2 font-semibold">Global Reach</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">International phone number support</p>
                 </CardContent>
               </Card>
-              <Card className="text-center border-purple-200 hover:border-purple-300 transition-colors">
+              <Card className="text-center transition-colors border-purple-200 hover:border-purple-300">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <BarChart3 className="h-6 w-6 text-purple-600" />
+                  <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-purple-100 rounded-lg">
+                    <BarChart3 className="w-6 h-6 text-purple-600" />
                   </div>
-                  <h3 className="font-semibold mb-2">Real-time Analytics</h3>
+                  <h3 className="mb-2 font-semibold">Real-time Analytics</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Track delivery and success rates</p>
                 </CardContent>
               </Card>
@@ -1093,9 +1046,9 @@ function App() {
               const Icon = category.icon
               return (
                 <div key={category.id} id={category.id}>
-                  <div className="flex items-center space-x-3 mb-6">
+                  <div className="flex items-center mb-6 space-x-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${category.color}`}>
-                      <Icon className="h-5 w-5 text-white" />
+                      <Icon className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold">{category.category}</h3>
@@ -1108,18 +1061,18 @@ function App() {
                   <div className="space-y-6">
                     {category.endpoints.map((endpoint, index) => (
                       <Card key={index} id={`${category.id}-endpoint-${index}`} className="overflow-hidden transition-all duration-200">
-                        <CardHeader className="bg-gray-50 dark:bg-gray-800/50">
+                        <CardHeader>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
                               <Badge className={getMethodColor(endpoint.method)}>
                                 {endpoint.method}
                               </Badge>
-                              <code className="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                              <code className="px-2 py-1 font-mono text-sm bg-gray-100 rounded dark:bg-gray-800">
                                 {endpoint.path}
                               </code>
                               {endpoint.requiresAuth && (
                                 <Badge variant="outline" className="text-xs">
-                                  <Key className="h-3 w-3 mr-1" />
+                                  <Key className="w-3 h-3 mr-1" />
                                   Auth Required
                                 </Badge>
                               )}
@@ -1133,14 +1086,14 @@ function App() {
                         <CardContent className="pt-6">
                           <Tabs defaultValue="example" className="w-full">
                             <TabsList className="grid w-full grid-cols-3">
-                              <TabsTrigger value="example">Example</TabsTrigger>
-                              <TabsTrigger value="request">Request</TabsTrigger>
-                              <TabsTrigger value="response">Response</TabsTrigger>
+                              <TabsTrigger className="cursor-pointer" value="example">Example</TabsTrigger>
+                              <TabsTrigger className="cursor-pointer" value="request">Request</TabsTrigger>
+                              <TabsTrigger className="cursor-pointer" value="response">Response</TabsTrigger>
                             </TabsList>
-                            
+
                             <TabsContent value="example" className="space-y-4">
                               <div>
-                                <h4 className="font-semibold mb-2">cURL Example</h4>
+                                <h4 className="mb-2 font-semibold">cURL Example</h4>
                                 <CodeBlock
                                   id={`curl-${category.id}-${index}`}
                                   language="bash"
@@ -1150,9 +1103,9 @@ function App() {
   -d '${JSON.stringify(endpoint.requestBody, null, 2)}'` : ''}`}
                                 />
                               </div>
-                              
+
                               <div>
-                                <h4 className="font-semibold mb-2">JavaScript Example</h4>
+                                <h4 className="mb-2 font-semibold">JavaScript Example</h4>
                                 <CodeBlock
                                   id={`js-${category.id}-${index}`}
                                   language="javascript"
@@ -1170,21 +1123,21 @@ console.log(data);`}
                                 />
                               </div>
                             </TabsContent>
-                            
+
                             <TabsContent value="request" className="space-y-4">
                               {endpoint.queryParams && (
                                 <div>
-                                  <h4 className="font-semibold mb-2">Query Parameters</h4>
+                                  <h4 className="mb-2 font-semibold">Query Parameters</h4>
                                   <CodeBlock
                                     id={`query-${category.id}-${index}`}
                                     code={JSON.stringify(endpoint.queryParams, null, 2)}
                                   />
                                 </div>
                               )}
-                              
+
                               {endpoint.requestBody && (
                                 <div>
-                                  <h4 className="font-semibold mb-2">Request Body</h4>
+                                  <h4 className="mb-2 font-semibold">Request Body</h4>
                                   <CodeBlock
                                     id={`request-${category.id}-${index}`}
                                     code={JSON.stringify(endpoint.requestBody, null, 2)}
@@ -1192,10 +1145,10 @@ console.log(data);`}
                                 </div>
                               )}
                             </TabsContent>
-                            
+
                             <TabsContent value="response" className="space-y-4">
                               <div>
-                                <h4 className="font-semibold mb-2">Response Example</h4>
+                                <h4 className="mb-2 font-semibold">Response Example</h4>
                                 <CodeBlock
                                   id={`response-${category.id}-${index}`}
                                   code={JSON.stringify(endpoint.response, null, 2)}
@@ -1207,7 +1160,7 @@ console.log(data);`}
                       </Card>
                     ))}
                   </div>
-                  
+
                   {category.id !== filteredEndpoints[filteredEndpoints.length - 1].id && (
                     <Separator className="my-12" />
                   )}
@@ -1216,10 +1169,10 @@ console.log(data);`}
             })}
 
             {/* Getting Started Section */}
-            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200">
+            <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Book className="h-5 w-5" />
+                  <Book className="w-5 h-5" />
                   <span>Getting Started</span>
                 </CardTitle>
                 <CardDescription>
@@ -1227,7 +1180,7 @@ console.log(data);`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <h4 className="font-semibold">1. Authentication</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -1260,21 +1213,21 @@ console.log(data);`}
       </div>
 
       {/* Footer */}
-      <footer className="border-t bg-white dark:bg-gray-900 mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center space-y-4">
+      <footer className="mt-16 bg-white border-t dark:bg-gray-900">
+        <div className="container px-4 py-8 mx-auto">
+          <div className="space-y-4 text-center">
             <div className="flex items-center justify-center space-x-2">
-              <img 
-                src="/cx-engine-logo.svg" 
-                alt="CX Engine" 
-                className="h-6 w-auto"
+              <img
+                src="/cx-engine-logo.svg"
+                alt="CX Engine"
+                className="w-auto h-6"
                 onError={(e) => {
                   e.target.style.display = 'none'
                   e.target.nextSibling.style.display = 'flex'
                 }}
               />
-              <div className="w-6 h-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded flex items-center justify-center" style={{display: 'none'}}>
-                <MessageSquare className="h-4 w-4 text-white" />
+              <div className="flex items-center justify-center w-6 h-6 rounded bg-gradient-to-r from-blue-600 to-purple-600" style={{display: 'none'}}>
+                <MessageSquare className="w-4 h-4 text-white" />
               </div>
               <span className="font-semibold">SMS API</span>
             </div>
