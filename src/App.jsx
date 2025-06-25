@@ -31,6 +31,8 @@ import {
   Webhook,
   Mail
 } from 'lucide-react'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import './App.css'
 
 function App() {
@@ -139,6 +141,7 @@ ${fetchOptions}
 });
 
 const data = await response.json();
+
 console.log(data);`
   }
 
@@ -169,6 +172,7 @@ $response = $client->request('${endpoint.method}', ${pathVar}, [
 
 $body = $response->getBody();
 $data = json_decode($body, true);
+
 print_r($data);`
   }
 
@@ -957,9 +961,14 @@ print_r($data);`
           {copiedCode === id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
         </Button>
       </div>
-      <pre className="p-4 overflow-x-auto rounded-b-lg bg-gray-50 dark:bg-gray-900">
-        <code className="text-sm">{code}</code>
-      </pre>
+      <SyntaxHighlighter
+        language={language}
+        style={oneLight}
+        customStyle={{ margin: 0, borderRadius: '0 0 0.5rem 0.5rem', fontSize: '0.875rem', background: 'inherit' }}
+        showLineNumbers={false}
+      >
+        {code}
+      </SyntaxHighlighter>
     </div>
   )
 
