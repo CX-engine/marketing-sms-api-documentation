@@ -997,14 +997,18 @@ print_r($data);`
               <p className="text-sm text-gray-600 dark:text-gray-400">Comprehensive API Documentation</p>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="secondary" className="text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300">
+              {/* <Badge variant="secondary" className="text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300">
                 <div className="w-2 h-2 mr-2 bg-green-500 rounded-full"></div>
                 v1.0.0
-              </Badge>
-              <Button variant="outline" size="sm" className="text-white bg-blue-600 border-blue-600 hover:bg-blue-700">
+              </Badge> */}
+              <a
+                href="/sms-marketing-api-openapi.yaml"
+                download
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-white transition-colors bg-blue-600 border border-blue-600 rounded-lg cursor-pointer hover:bg-blue-700"
+              >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 OpenAPI Spec
-              </Button>
+              </a>
             </div>
           </div>
         </div>
@@ -1359,13 +1363,11 @@ print_r($data);`
               <span className="font-semibold">SMS API</span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Built with ❤️ for developers. Need help? Contact our support team.
+              Built with ❤️ at{' '}
+              <a href="https://cx-engine.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">CX-Engine</a>.
+              Need help? Contact our support team at{' '}
+              <a href="mailto:developers@cx-engine.com" className="text-blue-600 hover:underline">developers@cx-engine.com</a>.
             </p>
-            <div className="flex items-center justify-center space-x-4">
-              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">Documentation</Button>
-              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">Support</Button>
-              <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">Status</Button>
-            </div>
           </div>
         </div>
       </footer>
