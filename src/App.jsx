@@ -746,7 +746,7 @@ print_r($data);`
           requiresAuth: true,
           requestBody: {
             name: 'Summer Sale Campaign',
-            content: 'Get 20% off all items! Use code SUMMER20. Valid until July 31st.',
+            content: 'Hello  %%name%%! Get 20% off all items. Use code SUMMER20. Valid until July 31st.',
             account_id: '1',
             type: 'campaign',
             marketing: true,

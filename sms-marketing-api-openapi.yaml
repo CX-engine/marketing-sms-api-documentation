@@ -2,8 +2,8 @@ openapi: 3.0.3
 info:
   title: SMS API
   description: |
-    A comprehensive SMS marketing API that allows users to manage SMS campaigns, recipients, and organizations. 
-    
+    A comprehensive SMS marketing API that allows users to manage SMS campaigns, recipients, and organizations.
+
     ## Features
     - Role-based access control (Admin, Manager, User)
     - Multi-tenant architecture (Organizations > Accounts > Users)
@@ -11,7 +11,7 @@ info:
     - Recipient and list management
     - Real-time webhooks and integrations
     - Comprehensive reporting and analytics
-    
+
     ## Authentication
     This API uses OAuth2 with Personal Access Tokens. Include your token in the Authorization header:
     ```
@@ -23,7 +23,7 @@ info:
     email: support@cx-engine.com
   license:
     name: Proprietary
-    
+
 servers:
   - url: https://sms.encom.tel/api
     description: Production server
@@ -219,7 +219,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedUsers'
-    
+
     post:
       tags:
         - Users
@@ -271,7 +271,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    
+
     put:
       tags:
         - Users
@@ -303,7 +303,7 @@ paths:
                   updated:
                     type: boolean
                     example: true
-    
+
     delete:
       tags:
         - Users
@@ -352,7 +352,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedOrganizations'
-    
+
     post:
       tags:
         - Organizations
@@ -392,7 +392,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Organization'
-    
+
     put:
       tags:
         - Organizations
@@ -423,7 +423,7 @@ paths:
                     $ref: '#/components/schemas/Organization'
                   updated:
                     type: boolean
-    
+
     delete:
       tags:
         - Organizations
@@ -471,7 +471,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedAccounts'
-    
+
     post:
       tags:
         - Accounts
@@ -511,7 +511,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Account'
-    
+
     put:
       tags:
         - Accounts
@@ -542,7 +542,7 @@ paths:
                     $ref: '#/components/schemas/Account'
                   updated:
                     type: boolean
-    
+
     delete:
       tags:
         - Accounts
@@ -588,7 +588,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
-    
+
     put:
       tags:
         - Accounts
@@ -914,7 +914,7 @@ components:
                   count:
                     type: integer
                     example: 150
-    
+
     post:
       tags:
         - Recipients
@@ -1004,7 +1004,7 @@ components:
             application/json:
               schema:
                 $ref: '#/components/schemas/Recipient'
-    
+
     put:
       tags:
         - Recipients
@@ -1056,7 +1056,7 @@ components:
                   hint:
                     type: string
                     example: "123-invalid"
-    
+
     delete:
       tags:
         - Recipients
@@ -1096,7 +1096,7 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/RecipientExport'
-    
+
     post:
       tags:
         - Recipients
@@ -1157,7 +1157,7 @@ components:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedRecipientLists'
-    
+
     post:
       tags:
         - Recipient Lists
@@ -1197,7 +1197,7 @@ components:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipientList'
-    
+
     put:
       tags:
         - Recipient Lists
@@ -1228,7 +1228,7 @@ components:
                     $ref: '#/components/schemas/RecipientList'
                   updated:
                     type: boolean
-    
+
     delete:
       tags:
         - Recipient Lists
@@ -1274,7 +1274,7 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipient'
-    
+
     put:
       tags:
         - Recipient Lists
@@ -1345,7 +1345,7 @@ components:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedCampaigns'
-    
+
     post:
       tags:
         - SMS Campaigns
@@ -1398,7 +1398,7 @@ components:
             application/json:
               schema:
                 $ref: '#/components/schemas/SmsCampaign'
-    
+
     put:
       tags:
         - SMS Campaigns
@@ -1429,7 +1429,7 @@ components:
                     $ref: '#/components/schemas/SmsCampaign'
                   updated:
                     type: boolean
-    
+
     delete:
       tags:
         - SMS Campaigns
@@ -1594,68 +1594,6 @@ components:
                   message:
                     type: string
                     example: Thank you for your feedback
-
-  /webhook/sms/iag:
-    post:
-      tags:
-        - Webhooks
-      summary: SMS IAG webhook
-      description: Webhook endpoint for SMS provider IAG status updates
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              description: Webhook payload from SMS provider
-      responses:
-        '200':
-          description: Webhook processed successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-
-  /incoming-mail/mg:
-    post:
-      tags:
-        - Webhooks
-      summary: Mailgun incoming mail webhook
-      description: Webhook endpoint for Mailgun incoming mail processing
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              description: Mailgun webhook payload
-      responses:
-        '200':
-          description: Webhook processed successfully
-
-  /incoming-mail/pm:
-    post:
-      tags:
-        - Webhooks
-      summary: Postmark incoming mail webhook
-      description: Webhook endpoint for Postmark incoming mail processing
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              description: Postmark webhook payload
-      responses:
-        '200':
-          description: Webhook processed successfully
 
   /users/{user}/welcome:
     post:
