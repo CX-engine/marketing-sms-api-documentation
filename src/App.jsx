@@ -38,6 +38,7 @@ function App() {
   const [activeEndpoint, setActiveEndpoint] = useState(null)
   const [copiedCode, setCopiedCode] = useState('')
   const [openCategories, setOpenCategories] = useState({})
+  const [exampleSelection, setExampleSelection] = useState('curl')
 
   const copyToClipboard = async (text, id) => {
     try {
@@ -66,6 +67,109 @@ function App() {
         element.classList.remove('ring-2', 'ring-blue-500', 'ring-opacity-50')
       }, 2000)
     }
+  }
+
+  // Helper to convert JS object to PHP array string
+  const jsObjToPhpArray = (obj, indent = 0) => {
+    const pad = '  '.repeat(indent)
+    if (Array.isArray(obj)) {
+      let items = obj.map(item => jsObjToPhpArray(item, indent + 1)).join(',\n')
+      return `[\n${items}\n${pad}]`
+    } else if (typeof obj === 'object' && obj !== null) {
+      let items = Object.entries(obj).map(([key, value]) => {
+        return `${pad}  '${key}' => ${jsObjToPhpArray(value, indent + 1)}`
+      }).join(',\n')
+      return `[\n${items}\n${pad}]`
+    } else if (typeof obj === 'string') {
+      return `'${obj.replace(/'/g, "\\'")}'`
+    } else if (typeof obj === 'number' || typeof obj === 'boolean') {
+      return obj.toString()
+    } else {
+      return 'null'
+    }
+  }
+
+  // Helper to convert queryParams object to query string
+  const getQueryString = (queryParams) => {
+    if (!queryParams) return ''
+    const esc = encodeURIComponent
+    return (
+      '?' +
+      Object.entries(queryParams)
+        .map(([k, v]) =>
+          Array.isArray(v)
+            ? v.map(val => `${esc(k)}=${esc(val)}`).join('&')
+            : `${esc(k)}=${esc(v)}`
+        )
+        .join('&')
+    )
+  }
+
+  // Helper to generate cURL example
+  const getCurlExample = (endpoint) => {
+    const query = endpoint.queryParams ? getQueryString(endpoint.queryParams) : ''
+    return `curl -X ${endpoint.method} "https://sms.encom.tel/api${endpoint.path}${query}" \n\
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \n\
+  -H "Content-Type: application/json"${endpoint.requestBody ? ` \n\
+  -d '${JSON.stringify(endpoint.requestBody, null, 2)}'` : ''}`.replace(/\\"/g, '"')
+  }
+
+  // Helper to generate JavaScript example
+  const getJsExample = (endpoint) => {
+    let queryBlock = ''
+    let urlVar = `'https://sms.encom.tel/api${endpoint.path}'`
+    if (endpoint.queryParams) {
+      queryBlock = `const params = ${JSON.stringify(endpoint.queryParams, null, 2)};
+const url = 'https://sms.encom.tel/api${endpoint.path}' + '?' + new URLSearchParams(params).toString();
+`
+      urlVar = 'url'
+    }
+    let fetchOptions = `  method: '${endpoint.method}',
+  headers: {
+    'Authorization': 'Bearer YOUR_ACCESS_TOKEN',
+    'Content-Type': 'application/json'
+  }`
+    if (endpoint.requestBody) {
+      const bodyString = JSON.stringify(endpoint.requestBody, null, 2)
+      fetchOptions += `,
+  body: JSON.stringify(${bodyString.replace(/\n/g, '\n  ')})`
+    }
+    return `${queryBlock}const response = await fetch(${urlVar}, {
+${fetchOptions}
+});
+
+const data = await response.json();
+console.log(data);`
+  }
+
+  // Helper to generate PHP example using Guzzle
+  const getPhpExample = (endpoint) => {
+    let body = ''
+    if (endpoint.requestBody) {
+      body = `\n    'body' => json_encode(${jsObjToPhpArray(endpoint.requestBody, 2)}),`
+    }
+    let queryBlock = ''
+    let pathVar = `'https://sms.encom.tel/api${endpoint.path}'`
+    if (endpoint.queryParams) {
+      queryBlock = `$query = ${jsObjToPhpArray(endpoint.queryParams, 1)};
+$path = 'https://sms.encom.tel/api${endpoint.path}' . '?' . http_build_query($query);`
+      pathVar = '$path'
+    }
+    return `<?php require 'vendor/autoload.php';
+
+use GuzzleHttp\\Client;
+
+${queryBlock ? queryBlock + '\n\n' : ''}$client = new Client();
+$response = $client->request('${endpoint.method}', ${pathVar}, [
+    'headers' => [
+        'Authorization' => 'Bearer YOUR_ACCESS_TOKEN',
+        'Content-Type' => 'application/json',
+    ],${body}
+]);
+
+$body = $response->getBody();
+$data = json_decode($body, true);
+print_r($data);`
   }
 
   const endpoints = [
@@ -1093,34 +1197,48 @@ function App() {
 
                             <TabsContent value="example" className="space-y-4">
                               <div>
-                                <h4 className="mb-2 font-semibold">cURL Example</h4>
-                                <CodeBlock
-                                  id={`curl-${category.id}-${index}`}
-                                  language="bash"
-                                  code={`curl -X ${endpoint.method} "https://sms.encom.tel/api${endpoint.path}" \\
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\
-  -H "Content-Type: application/json"${endpoint.requestBody ? ` \\
-  -d '${JSON.stringify(endpoint.requestBody, null, 2)}'` : ''}`}
-                                />
-                              </div>
-
-                              <div>
-                                <h4 className="mb-2 font-semibold">JavaScript Example</h4>
-                                <CodeBlock
-                                  id={`js-${category.id}-${index}`}
-                                  language="javascript"
-                                  code={`const response = await fetch('https://sms.encom.tel/api${endpoint.path}', {
-  method: '${endpoint.method}',
-  headers: {
-    'Authorization': 'Bearer YOUR_ACCESS_TOKEN',
-    'Content-Type': 'application/json'
-  }${endpoint.requestBody ? `,
-  body: JSON.stringify(${JSON.stringify(endpoint.requestBody, null, 2)})` : ''}
-});
-
-const data = await response.json();
-console.log(data);`}
-                                />
+                                {/* Example selector dropdown */}
+                                <label className="block mb-2 text-sm font-semibold" htmlFor="example-select-global">Example Language</label>
+                                <select
+                                  id="example-select-global"
+                                  className="px-2 py-1 mb-4 text-sm border rounded dark:bg-gray-800 dark:text-white"
+                                  value={exampleSelection}
+                                  onChange={e => setExampleSelection(e.target.value)}
+                                >
+                                  <option value="curl">cURL</option>
+                                  <option value="javascript">JavaScript</option>
+                                  <option value="php">PHP</option>
+                                </select>
+                                {/* Show only the selected code block */}
+                                {(() => {
+                                  const selected = exampleSelection
+                                  if (selected === 'curl') {
+                                    return (
+                                      <CodeBlock
+                                        id={`curl-${category.id}-${index}`}
+                                        language="bash"
+                                        code={getCurlExample(endpoint)}
+                                      />
+                                    )
+                                  } else if (selected === 'javascript') {
+                                    return (
+                                      <CodeBlock
+                                        id={`js-${category.id}-${index}`}
+                                        language="javascript"
+                                        code={getJsExample(endpoint)}
+                                      />
+                                    )
+                                  } else if (selected === 'php') {
+                                    return (
+                                      <CodeBlock
+                                        id={`php-${category.id}-${index}`}
+                                        language="php"
+                                        code={getPhpExample(endpoint)}
+                                      />
+                                    )
+                                  }
+                                  return null
+                                })()}
                               </div>
                             </TabsContent>
 
